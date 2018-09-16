@@ -8,6 +8,7 @@ export const employeeService = {
   uploadFile,
   getAllCustomers,
   createCustomer,
+  updateCustomerDetails,
 }
 
 function uploadFile(formData) {
@@ -38,6 +39,15 @@ function createCustomer(customer) {
   return fetch(`${config.apiUrl}/employee/createCustomer`, requestOptions).then(handleResponse);
 }
 
+function updateCustomerDetails(customerData) {
+  const requestOptions = {
+    method: 'PUT',
+    headers: authHeader(),
+    body: JSON.stringify(customerData)
+  };
+
+  return fetch(`${config.apiUrl}/employee/updateCustomer`, requestOptions).then(handleResponse);
+}
 
 function handleResponse(response) {
   return response.text().then(text => {

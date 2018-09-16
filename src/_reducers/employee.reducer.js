@@ -10,7 +10,7 @@ export function employee(state = {}, action) {
       };
     case employeeConstants.UPLOADFILE_SUCCESS:
       return {
-        data: action.data,
+        uploadData: action.data.uploadData,
         success: true
       };
     case employeeConstants.UPLOADFILE_FAILURE:
@@ -37,6 +37,16 @@ export function employee(state = {}, action) {
       };
     case employeeConstants.CREATECUST_FAILURE:
       return {};
+    case employeeConstants.UPDATECUST_REQUEST:
+      return {
+        updatingCust: true
+      }
+    case employeeConstants.UPDATECUST_SUCCESS:
+      return {
+        success: true
+      }
+    case employeeConstants.UPDATECUST_FAILURE:
+      return {}
     default:
       return state
   }
