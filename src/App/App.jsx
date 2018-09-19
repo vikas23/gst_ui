@@ -1,3 +1,4 @@
+import '../../node_modules/bootstrap/dist/css/bootstrap.min.css';
 import React from "react";
 import { Router, Route } from "react-router-dom";
 import { connect } from "react-redux";
