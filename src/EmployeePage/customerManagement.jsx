@@ -25,7 +25,6 @@ const FILETYPE = {
   "ELECTRICITY_BILL_OF_PROPRIETOR": "propBill",
   "RENT_AGREEMENT_OF_FIRM": "rentDoc"
 };
-let currentCust = {};
 Modal.setAppElement("#app");
 
 class CustomerManagement extends Component {
@@ -85,6 +84,16 @@ class CustomerManagement extends Component {
       }
     });
   }
+  handleChangeCust(event) {
+    const { name, value } = event.target;
+    const { currentCustomer } = this.state;
+    this.setState({
+      currentCustomer: {
+        ...currentCustomer,
+        [name]: value
+      }
+    });
+  }
   handleSubmit(event) {
     event.preventDefault();
 
@@ -101,12 +110,22 @@ class CustomerManagement extends Component {
 
   openEditModal(event, cust) {
     this.setState({ editModalIsOpen: true });
-    currentCust = cust;
     this.setState({
       currentCustomer: {
         ...this.state.currentCustomer,
         name: cust.name,
-        phone: cust.phone
+        phone: cust.phone,
+        propPhoto: cust.propPhoto,
+        panProp: cust.panProp,
+        aadharPhoto: cust.aadharPhoto,
+        bankDoc: cust.bankDoc,
+        propBill: cust.propBill,
+        rentDoc: cust.rentDoc,
+        firmName: cust.firmName,
+        businessNature: cust.businessNature,
+        commoditiesName: cust.commoditiesName,
+        propPhone: cust.propPhone,
+        propEmail: cust.propEmail
       }
     });
 
@@ -126,11 +145,12 @@ class CustomerManagement extends Component {
   }
 
   handleFileUpload(event, prefix) {
+    const { name, value } = event.target;
     this.setState({ file: event.target.files });
     const formData = new FormData();
     formData.append("file", event.target.files[0]);
-    formData.append("customerName", currentCust.name);
-    formData.append("customerPhone", currentCust.phone);
+    formData.append("customerName", this.state.currentCustomer.name);
+    formData.append("customerPhone", this.state.currentCustomer.phone);
     formData.append("filePrefix", prefix);
     const self = this;
     this.props.dispatch(employeeActions.uploadFile(formData, function (data) {
@@ -143,7 +163,6 @@ class CustomerManagement extends Component {
 
   submitFile(event) {
     event.preventDefault();
-
     this.props.dispatch(employeeActions.updateCustomerDetails(this.state.currentCustomer))
   }
 
@@ -251,21 +270,22 @@ class CustomerManagement extends Component {
         <Modal
           isOpen={this.state.editModalIsOpen}
           onAfterOpen={this.afterOpenModal}
-          onRequestClose={this.closeModal}
+          onRequestClose={this.closeEditModal}
           style={customStyles}
           contentLabel="Example Modal"
         >
           <h2 ref={subtitle => (this.subtitle = subtitle)}>
-            Edit Customer Details
+            View/Edit Customer Details
           </h2>
-          <button className="btn-link pull-right" onClick={this.closeModal}>
+          <button className="btn-link pull-right" onClick={this.closeEditModal}>
             close
           </button>
           <form name="form" onSubmit={this.submitFile}>
             NAME OF FIRM:
-            <input type="text" name="firmName" className="form-control"></input>
+            <input type="text" name="firmName" value={currentCustomer.firmName} className="form-control"></input>
             <br />
             PHOTOGRAPH OF PROPRIETOR:
+            {currentCustomer.propPhoto && <a href={currentCustomer.propPhoto}>View Current</a>}
             <input
               label="upload file"
               type="file"
@@ -275,6 +295,7 @@ class CustomerManagement extends Component {
             />
             <br />
             PAN CARD OF PROPRIETOR:
+            {currentCustomer.panProp && <a href={currentCustomer.panProp}>View Current</a>}
             <input
               label="upload file"
               type="file"
@@ -284,6 +305,7 @@ class CustomerManagement extends Component {
             />
             <br />
             AADHAR CARD OF PROPRIETOR:
+            {currentCustomer.aadharPhoto && <a href={currentCustomer.aadharPhoto}>View Current</a>}
             <input
               label="upload file"
               type="file"
@@ -293,6 +315,7 @@ class CustomerManagement extends Component {
             />
             <br />
             CANCELLED CHEQUE / BANK PASS BOOK OF PROPRIETOR:
+            <a href={currentCustomer.propPhoto}>View Current</a>
             <input
               label="upload file"
               type="file"
@@ -301,7 +324,8 @@ class CustomerManagement extends Component {
               onChange={(e) => this.handleFileUpload(e, "CANCELLED_CHEQUE_OF_PROPRIETOR")}
             />
             <br />
-            ELECTRICITY BILL / WATER BILL OF PROPRIETOR (IF OWNED PROPERTY)
+            ELECTRICITY BILL / WATER BILL OF PROPRIETOR (IF OWNED PROPERTY):
+            <a href={currentCustomer.propPhoto}>View Current</a>
             <input
               label="upload file"
               type="file"
@@ -310,7 +334,8 @@ class CustomerManagement extends Component {
               onChange={(e) => this.handleFileUpload(e, "ELECTRICITY_BILL_OF_PROPRIETOR")}
             />
             <br />
-            RENT AGREEMENT OF FIRM (IF RENTED PROMISES)
+            RENT AGREEMENT OF FIRM (IF RENTED PROMISES):
+            <a href={currentCustomer.propPhoto}>View Current</a>
             <input
               label="upload file"
               type="file"
@@ -318,18 +343,18 @@ class CustomerManagement extends Component {
               className="formControl"
               onChange={(e) => this.handleFileUpload(e, "RENT_AGREEMENT_OF_FIRM")}
             />
-            NATURE OF BUSINESS (TRADING / MANUFACTURING / SERVICE)
+            NATURE OF BUSINESS (TRADING / MANUFACTURING / SERVICE):
             <br />
-            <input type="text" name="businessNature" className="form-control"></input>
+            <input type="text" name="businessNature" value={currentCustomer.businessNature} className="form-control" onChange={this.handleChangeCust}></input>
             <br />
             NAME OF COMMODITIES / ITEMS:
-            <input type="text" name="commoditiesName" className="form-control"></input>
+            <input type="text" name="commoditiesName" value={currentCustomer.commoditiesName} className="form-control" onChange={this.handleChangeCust}></input>
             <br />
             MOBILE NO. OF PROPRIETOR:
-            <input type="number" name="propPhone" className="form-control"></input>
+            <input type="number" name="propPhone" value={currentCustomer.propPhone} className="form-control" onChange={this.handleChangeCust}></input>
             <br />
             EMAIL ADDRESS OF PROPRIETOR:
-            <input type="number" name="propEmail" className="form-control"></input>
+            <input type="email" name="propEmail" value={currentCustomer.propEmail} className="form-control" onChange={this.handleChangeCust}></input>
             <br />
             <button className="formControl" type="submit">Send</button>
           </form>

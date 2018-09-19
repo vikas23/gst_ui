@@ -3,7 +3,6 @@ import {
 } from '../_constants';
 
 export function employer(state = {}, action) {
-  console.log(action);
   switch (action.type) {
     case employerConstants.CREATEEMP_REQUEST:
       return {
