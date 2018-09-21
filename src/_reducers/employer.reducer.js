@@ -25,6 +25,16 @@ export function employer(state = {}, action) {
       }
     case employerConstants.GETALLEMP_FAILURE:
       return {}
+    case employerConstants.SETLICENSE_REQUEST:
+      return {
+        setingLicense: true
+      }
+    case employerConstants.SETLICENSE_SUCCESS:
+      return {
+        success: true
+      }
+    case employerConstants.SETLICENSE_FAILURE:
+      return {}
     default:
       return state
   }

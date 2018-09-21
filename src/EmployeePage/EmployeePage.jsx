@@ -2,8 +2,9 @@ import React, { Component } from "react";
 import { connect } from "react-redux";
 import { BrowserRouter as Router, Route, Link } from "react-router-dom";
 import { CustomerManagement } from "./customerManagement";
+import { Navbar, Nav, NavItem } from "react-bootstrap";
+import { userActions } from "../_actions";
 
-import { employeeActions } from '../_actions';
 const routes = [
   {
     path: "/customerManagement",
@@ -13,28 +14,49 @@ const routes = [
 ];
 
 class EmployeePage extends Component {
+  constructor(props) {
+    super(props);
+    this.logout = this.logout.bind(this);
+  }
+
+  logout() {
+    this.props.dispatch(userActions.logout());
+  }
 
   render() {
     return (
-      <Router>
-        <div style={{ display: "flex" }}>
-          <ul style={{ listStyleType: "node", padding: 0 }}>
-            <li>
-              <Link to="/customerManagement" >Customer Management</Link>
-            </li>
-          </ul>
-          <div style={{ flex: 1 }}>
-            {routes.map(route => (
-              <Route
-                key={route.path}
-                path={route.path}
-                exact={route.exact}
-                component={route.main}
-              />
-            ))}
+      <div>
+        <Navbar>
+          <Nav pullRight>
+            <NavItem eventKey={1} href="#" onClick={this.logout}>
+              Logout
+            </NavItem>
+          </Nav>
+        </Navbar>
+        <Router>
+          <div className="sidebar" style={{ listStyleType: "node", padding: 0 }}>
+            <nav className="sidebar-nav" style={{ display: "flex" }}>
+              <div>
+                <ul style={{ listStyleType: "node", padding: 0 }} className="nav">
+                  <li className="nav-item">
+                    <Link to="/customerManagement" >Customer Management</Link>
+                  </li>
+                </ul>
+              </div>
+              <div style={{ flex: 1 }}>
+                {routes.map(route => (
+                  <Route
+                    key={route.path}
+                    path={route.path}
+                    exact={route.exact}
+                    component={route.main}
+                  />
+                ))}
+              </div>
+            </nav>
           </div>
-        </div>
-      </Router>
+        </Router>
+      </div>
     );
   }
 }

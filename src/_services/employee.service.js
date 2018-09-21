@@ -4,6 +4,14 @@ import {
   authHeaderNoJson
 } from '../_helpers';
 
+import {
+  userService
+} from './user.service';
+
+const {
+  handleResponse
+} = userService;
+
 export const employeeService = {
   uploadFile,
   getAllCustomers,
@@ -47,23 +55,4 @@ function updateCustomerDetails(customerData) {
   };
 
   return fetch(`${config.apiUrl}/employee/updateCustomer`, requestOptions).then(handleResponse);
-}
-
-function handleResponse(response) {
-  return response.text().then(text => {
-    const data = text && JSON.parse(text);
-    console.log(data);
-    if (!response.ok) {
-      if (response.status === 401) {
-        // auto logout if 401 response returned from api
-        logout();
-        location.reload(true);
-      }
-
-      const error = (data && data.message) || response.statusText;
-      return Promise.reject(error);
-    }
-
-    return data;
-  });
 }

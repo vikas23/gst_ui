@@ -10,7 +10,8 @@ import {
 
 export const employerActions = {
   registerEmployee,
-  getAllEmployees
+  getAllEmployees,
+  setLicense
 };
 
 function registerEmployee(data) {
@@ -79,6 +80,39 @@ function getAllEmployees() {
   function failure(error) {
     return {
       type: employerConstants.GETALLEMP_FAILURE,
+      error
+    }
+  }
+}
+
+function setLicense() {
+  return dispatch => {
+
+    dispatch(request());
+
+    employerService.setLicense()
+      .then(
+        data => dispatch(success(data)),
+        error => dispatch(failure(error.toString()))
+      );
+  };
+
+  function request() {
+    return {
+      type: employerConstants.SETLICENSE_REQUEST
+    }
+  }
+
+  function success(data) {
+    return {
+      type: employerConstants.SETLICENSE_SUCCESS,
+      data
+    }
+  }
+
+  function failure(error) {
+    return {
+      type: employerConstants.SETLICENSE_FAILURE,
       error
     }
   }

@@ -1,21 +1,8 @@
 import React, { Component } from "react";
-import Modal from "react-modal";
-import { Table } from "react-bootstrap";
+import { Table, Button, Modal, FormGroup } from "react-bootstrap";
 import { connect } from "react-redux";
 
 import { employeeActions } from "../_actions";
-
-const customStyles = {
-  content: {
-    top: "50%",
-    left: "50%",
-    right: "auto",
-    bottom: "auto",
-    marginRight: "-50%",
-    transform: "translate(-50%, -50%)",
-    width: "30%"
-  }
-};
 
 const FILETYPE = {
   "PHOTOGRAPH_OF_PROPRIETOR": "propPhoto",
@@ -25,7 +12,36 @@ const FILETYPE = {
   "ELECTRICITY_BILL_OF_PROPRIETOR": "propBill",
   "RENT_AGREEMENT_OF_FIRM": "rentDoc"
 };
-Modal.setAppElement("#app");
+
+function FieldGroupUpload({ labelName, labelText, item, itemKey, handleFileUpload }) {
+  return (
+    <div className="form-group">
+      <label htmlFor={labelName}>{labelText}</label>
+      <br />
+      {item && <a className="pull-left" style={{ marginRight: "10px" }} target="_blank" href={item}>View Current</a>}
+      <input
+        label="upload file"
+        type="file"
+        name={labelName}
+        onChange={(e) => handleFileUpload(e, itemKey)}
+      />
+    </div >
+  );
+}
+
+function FieldGroup({ labelName, labelText, handleChangeCust, item }) {
+  return (
+    <div className="form-group">
+      <label htmlFor={labelName}>{labelText}</label>
+      <input
+        type="text"
+        name={labelName}
+        value={item}
+        className="form-control"
+        onChange={handleChangeCust}></input>
+    </div>
+  );
+}
 
 class CustomerManagement extends Component {
 
@@ -62,7 +78,6 @@ class CustomerManagement extends Component {
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
     this.openModal = this.openModal.bind(this);
-    this.afterOpenModal = this.afterOpenModal.bind(this);
     this.closeModal = this.closeModal.bind(this);
     this.openEditModal = this.openEditModal.bind(this);
     this.closeEditModal = this.closeEditModal.bind(this);
@@ -131,10 +146,6 @@ class CustomerManagement extends Component {
 
 
   }
-  afterOpenModal() {
-    // references are now sync'd and can be accessed.
-    this.subtitle.style.color = "#000";
-  }
 
   closeModal() {
     this.setState({ modalIsOpen: false });
@@ -187,177 +198,172 @@ class CustomerManagement extends Component {
                     <td>{emp.name}</td>
                     <td>{emp.phone}</td>
                     <td>
-                      <button onClick={(e) => this.openEditModal(event, emp)}>Edit Customer Info</button>
+                      <Button bsStyle="primary" onClick={(e) => this.openEditModal(event, emp)}>Edit Customer Info</Button>
                     </td>
                   </tr>
                 ))}
               </tbody>
             </Table>
           )}
-        <button onClick={this.openModal}>Open Modal</button>
+        <Button bsStyle="primary" onClick={this.openModal}>Create New Customer</Button>
         <Modal
-          isOpen={this.state.modalIsOpen}
-          onAfterOpen={this.afterOpenModal}
-          onRequestClose={this.closeModal}
-          style={customStyles}
-          contentLabel="Example Modal"
+          show={this.state.modalIsOpen}
+          onHide={this.closeModal}
         >
-          <h2 ref={subtitle => (this.subtitle = subtitle)}>Create Customer</h2>
-          <button className="m-b-1  5" onClick={this.closeModal}>
-            close
-          </button>
-          <form name="form" onSubmit={this.handleSubmit}>
-            <div className={"form-group" + (submitted ? " has-error" : "")}>
-              <label htmlFor="name">Name</label>
-              <input
-                type="text"
-                className="form-control"
-                name="name"
-                value={customer.name}
-                onChange={this.handleChange}
-              />
-              {submitted &&
-                !customer.name && (
-                  <div className="help-block">Name is required</div>
-                )}
-            </div>
-            <div
-              className={
-                "form-group" +
-                (submitted && !customer.phone ? " has-error" : "")
-              }
-            >
-              <label htmlFor="phone">Phone</label>
-              <input
-                type="number"
-                className="form-control"
-                name="phone"
-                value={customer.phone}
-                onChange={this.handleChange}
-              />
-              {submitted &&
-                !customer.phone && (
-                  <div className="help-block">Phone is required</div>
-                )}
-            </div>
-            <div
-              className={
-                "form-group" +
-                (submitted && !customer.passworclosed ? " has-error" : "")
-              }
-            >
-              <label htmlFor="password">Password</label>
-              <input
-                type="password"
-                className="form-control"
-                name="password"
-                value={customer.password}
-                onChange={this.handleChange}
-              />
-              {submitted &&
-                !customer.password && (
-                  <div className="help-block">Password is required</div>
-                )}
-            </div>
-            <div className="form-group">
-              <button className="btn btn-primary">Create Employee</button>
-              {
-                <img src="data:image/gif;base64,R0lGODlhEAAQAPIAAP///wAAAMLCwkJCQgAAAGJiYoKCgpKSkiH/C05FVFNDQVBFMi4wAwEAAAAh/hpDcmVhdGVkIHdpdGggYWpheGxvYWQuaW5mbwAh+QQJCgAAACwAAAAAEAAQAAADMwi63P4wyklrE2MIOggZnAdOmGYJRbExwroUmcG2LmDEwnHQLVsYOd2mBzkYDAdKa+dIAAAh+QQJCgAAACwAAAAAEAAQAAADNAi63P5OjCEgG4QMu7DmikRxQlFUYDEZIGBMRVsaqHwctXXf7WEYB4Ag1xjihkMZsiUkKhIAIfkECQoAAAAsAAAAABAAEAAAAzYIujIjK8pByJDMlFYvBoVjHA70GU7xSUJhmKtwHPAKzLO9HMaoKwJZ7Rf8AYPDDzKpZBqfvwQAIfkECQoAAAAsAAAAABAAEAAAAzMIumIlK8oyhpHsnFZfhYumCYUhDAQxRIdhHBGqRoKw0R8DYlJd8z0fMDgsGo/IpHI5TAAAIfkECQoAAAAsAAAAABAAEAAAAzIIunInK0rnZBTwGPNMgQwmdsNgXGJUlIWEuR5oWUIpz8pAEAMe6TwfwyYsGo/IpFKSAAAh+QQJCgAAACwAAAAAEAAQAAADMwi6IMKQORfjdOe82p4wGccc4CEuQradylesojEMBgsUc2G7sDX3lQGBMLAJibufbSlKAAAh+QQJCgAAACwAAAAAEAAQAAADMgi63P7wCRHZnFVdmgHu2nFwlWCI3WGc3TSWhUFGxTAUkGCbtgENBMJAEJsxgMLWzpEAACH5BAkKAAAALAAAAAAQABAAAAMyCLrc/jDKSatlQtScKdceCAjDII7HcQ4EMTCpyrCuUBjCYRgHVtqlAiB1YhiCnlsRkAAAOwAAAAAAAAAAAA==" />
-              }
-            </div>
-          </form>
+          <Modal.Header closeButton>
+            <Modal.Title>Create Customer</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <form name="form" onSubmit={this.handleSubmit}>
+              <div className={"form-group" + (submitted ? " has-error" : "")}>
+                <label htmlFor="name">Name</label>
+                <input
+                  type="text"
+                  className="form-control"
+                  name="name"
+                  value={customer.name}
+                  onChange={this.handleChange}
+                />
+                {submitted &&
+                  !customer.name && (
+                    <div className="help-block">Name is required</div>
+                  )}
+              </div>
+              <div
+                className={
+                  "form-group" +
+                  (submitted && !customer.phone ? " has-error" : "")
+                }
+              >
+                <label htmlFor="phone">Phone</label>
+                <input
+                  type="number"
+                  className="form-control"
+                  name="phone"
+                  value={customer.phone}
+                  onChange={this.handleChange}
+                />
+                {submitted &&
+                  !customer.phone && (
+                    <div className="help-block">Phone is required</div>
+                  )}
+              </div>
+              <div
+                className={
+                  "form-group" +
+                  (submitted && !customer.passworclosed ? " has-error" : "")
+                }
+              >
+                <label htmlFor="password">Password</label>
+                <input
+                  type="password"
+                  className="form-control"
+                  name="password"
+                  value={customer.password}
+                  onChange={this.handleChange}
+                />
+                {submitted &&
+                  !customer.password && (
+                    <div className="help-block">Password is required</div>
+                  )}
+              </div>
+              <Modal.Footer>
+                <Button onClick={this.closeModal}>Close</Button>
+                <Button bsStyle="primary" onClick={this.handleSubmit}>Save changes</Button>
+              </Modal.Footer>
+            </form>
+          </Modal.Body>
         </Modal>
         <Modal
-          isOpen={this.state.editModalIsOpen}
-          onAfterOpen={this.afterOpenModal}
-          onRequestClose={this.closeEditModal}
-          style={customStyles}
-          contentLabel="Example Modal"
+          show={this.state.editModalIsOpen}
+          onHide={this.closeEditModal}
         >
-          <h2 ref={subtitle => (this.subtitle = subtitle)}>
-            View/Edit Customer Details
-          </h2>
-          <button className="btn-link pull-right" onClick={this.closeEditModal}>
-            close
-          </button>
-          <form name="form" onSubmit={this.submitFile}>
-            NAME OF FIRM:
-            <input type="text" name="firmName" value={currentCustomer.firmName} className="form-control"></input>
-            <br />
-            PHOTOGRAPH OF PROPRIETOR:
-            {currentCustomer.propPhoto && <a href={currentCustomer.propPhoto}>View Current</a>}
-            <input
-              label="upload file"
-              type="file"
-              name="propPhoto"
-              className="formControl"
-              onChange={(e) => this.handleFileUpload(e, "PHOTOGRAPH_OF_PROPRIETOR")}
-            />
-            <br />
-            PAN CARD OF PROPRIETOR:
-            {currentCustomer.panProp && <a href={currentCustomer.panProp}>View Current</a>}
-            <input
-              label="upload file"
-              type="file"
-              name="panProp"
-              className="formControl"
-              onChange={(e) => this.handleFileUpload(e, "PAN_CARD_OF_PROPRIETOR")}
-            />
-            <br />
-            AADHAR CARD OF PROPRIETOR:
-            {currentCustomer.aadharPhoto && <a href={currentCustomer.aadharPhoto}>View Current</a>}
-            <input
-              label="upload file"
-              type="file"
-              name="aadharPhoto"
-              className="formControl"
-              onChange={(e) => this.handleFileUpload(e, "AADHAR_CARD_OF_PROPRIETOR")}
-            />
-            <br />
-            CANCELLED CHEQUE / BANK PASS BOOK OF PROPRIETOR:
-            <a href={currentCustomer.propPhoto}>View Current</a>
-            <input
-              label="upload file"
-              type="file"
-              name="bankDoc"
-              className="formControl"
-              onChange={(e) => this.handleFileUpload(e, "CANCELLED_CHEQUE_OF_PROPRIETOR")}
-            />
-            <br />
-            ELECTRICITY BILL / WATER BILL OF PROPRIETOR (IF OWNED PROPERTY):
-            <a href={currentCustomer.propPhoto}>View Current</a>
-            <input
-              label="upload file"
-              type="file"
-              name="propBill"
-              className="formControl"
-              onChange={(e) => this.handleFileUpload(e, "ELECTRICITY_BILL_OF_PROPRIETOR")}
-            />
-            <br />
-            RENT AGREEMENT OF FIRM (IF RENTED PROMISES):
-            <a href={currentCustomer.propPhoto}>View Current</a>
-            <input
-              label="upload file"
-              type="file"
-              name="rentDoc"
-              className="formControl"
-              onChange={(e) => this.handleFileUpload(e, "RENT_AGREEMENT_OF_FIRM")}
-            />
-            NATURE OF BUSINESS (TRADING / MANUFACTURING / SERVICE):
-            <br />
-            <input type="text" name="businessNature" value={currentCustomer.businessNature} className="form-control" onChange={this.handleChangeCust}></input>
-            <br />
-            NAME OF COMMODITIES / ITEMS:
-            <input type="text" name="commoditiesName" value={currentCustomer.commoditiesName} className="form-control" onChange={this.handleChangeCust}></input>
-            <br />
-            MOBILE NO. OF PROPRIETOR:
-            <input type="number" name="propPhone" value={currentCustomer.propPhone} className="form-control" onChange={this.handleChangeCust}></input>
-            <br />
-            EMAIL ADDRESS OF PROPRIETOR:
-            <input type="email" name="propEmail" value={currentCustomer.propEmail} className="form-control" onChange={this.handleChangeCust}></input>
-            <br />
-            <button className="formControl" type="submit">Send</button>
-          </form>
+          <Modal.Header closeButton>
+            <Modal.Title>View/Edit Customer Details</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <form name="form" onSubmit={this.submitFile}>
+              <FieldGroup
+                labelName="firmName"
+                labelText="Name of firm"
+                handleChangeCust={this.handleChangeCust}
+                item={currentCustomer.firmName}
+              />
+              <div className="form-group">
+                <label htmlFor="firmName">Name of firm</label>
+                <input
+                  type="text"
+                  name="firmName"
+                  value={currentCustomer.firmName}
+                  className="form-control"
+                  onChange={this.handleChangeCust}></input>
+              </div>
+              <FieldGroupUpload
+                labelText="Photograph of Proprietor"
+                labelName="propPhoto"
+                item={currentCustomer.propPhoto}
+                itemKey="PHOTOGRAPH_OF_PROPRIETOR"
+                handleFileUpload={this.handleFileUpload}
+              />
+              <FieldGroupUpload
+                labelText="Pan Card of Proprietor"
+                labelName="panProp"
+                item={currentCustomer.panProp}
+                itemKey="PAN_CARD_OF_PROPRIETOR"
+                handleFileUpload={this.handleFileUpload}
+              />
+              <FieldGroupUpload
+                labelText="Aadhar card of Proprietor"
+                labelName="aadharPhoto"
+                item={currentCustomer.aadharPhoto}
+                itemKey="AADHAR_CARD_OF_PROPRIETOR"
+                handleFileUpload={this.handleFileUpload}
+              />
+              <FieldGroupUpload
+                labelText="Cancelled Cheque / Bank Passbook of Proprietor"
+                labelName="bankDoc"
+                item={currentCustomer.bankDoc}
+                itemKey="CANCELLED_CHEQUE_OF_PROPRIETOR"
+                handleFileUpload={this.handleFileUpload}
+              />
+              <FieldGroupUpload
+                labelText="Rent Agreement of firm"
+                labelName="rentDoc"
+                item={currentCustomer.rentDoc}
+                itemKey="RENT_AGREEMENT_OF_FIRM"
+                handleFileUpload={this.handleFileUpload}
+              />
+              <FieldGroup
+                labelName="firmName"
+                labelText="Nature of business (Trading/Manufacturing/Service)"
+                handleChangeCust={this.handleChangeCust}
+                item={currentCustomer.businessNature}
+              />
+              <FieldGroup
+                labelName="commoditiesName"
+                labelText="Name of comodities/items"
+                handleChangeCust={this.handleChangeCust}
+                item={currentCustomer.commoditiesName}
+              />
+              <FieldGroup
+                labelName="propPhone"
+                labelText="Mobile no. of proprietor"
+                handleChangeCust={this.handleChangeCust}
+                item={currentCustomer.propPhone}
+              />
+              <FieldGroup
+                labelName="propPhone"
+                labelText="Email address of proprietor"
+                handleChangeCust={this.handleChangeCust}
+                item={currentCustomer.propPhone}
+              />
+              <Modal.Footer>
+                <Button onClick={this.closeEditModal}>Close</Button>
+                <Button bsStyle="primary" onClick={this.submitFile}>Save changes</Button>
+              </Modal.Footer>
+            </form>
+          </Modal.Body>
+
         </Modal>
       </div>
     );
