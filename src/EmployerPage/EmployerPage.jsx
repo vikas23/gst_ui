@@ -26,7 +26,6 @@ class EmployerPage extends React.Component {
 
   logout() {
     this.props.dispatch(userActions.logout());
-    history.push('/login');
   }
 
   render() {

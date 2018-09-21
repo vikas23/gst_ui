@@ -66,6 +66,7 @@ function login(phone, password) {
 
 function logout() {
   userService.logout();
+  history.push('/')
   return {
     type: userConstants.LOGOUT
   };
