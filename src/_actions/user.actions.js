@@ -33,7 +33,19 @@ function login(phone, password) {
       .then(
         user => {
           dispatch(success(user));
-          user.userType === USERTYPE.EMPLOYER ? history.push('/') : history.push('/customerManagement');
+          switch (user.userType) {
+            case USERTYPE.EMPLOYER:
+              history.push('/');
+              break;
+            case USERTYPE.EMPLOYEE:
+              history.push('/customerManagement');
+              break;
+            case USERTYPE.CUSTOMER:
+              history.push('/customerMain');
+              break;
+            default:
+              break;
+          }
         },
         error => {
           dispatch(failure(error.toString()));

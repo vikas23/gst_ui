@@ -1,23 +1,25 @@
-import React, { Component } from "react";
+import React, { Component } from 'react';
 import { connect } from "react-redux";
 import { BrowserRouter as Router, Route, Link } from "react-router-dom";
 import { Navbar, Nav, NavItem } from "react-bootstrap";
 
 import { userActions } from "../_actions";
-import { CustomerManagement } from "./customerManagement";
-import { UpdateBill } from "./updateBill"
+import { UploadBills } from "./uploadBills";
+import { GstStatus } from "./gstStatus"
+
+
 const routes = [
   {
-    path: "/customerManagement",
+    path: "/customerMain",
     exact: true,
-    main: () => <CustomerManagement />
+    main: () => <UploadBills />
   }, {
-    path: "/customerBills",
-    main: () => <UpdateBill />
+    path: "/gstStatus",
+    main: () => <GstStatus />
   }
 ];
 
-class EmployeePage extends Component {
+class CustomerPage extends Component {
   constructor(props) {
     super(props);
     this.logout = this.logout.bind(this);
@@ -43,10 +45,10 @@ class EmployeePage extends Component {
               <div>
                 <ul style={{ listStyleType: "node", padding: 0 }} className="nav">
                   <li className="nav-item">
-                    <Link to="/customerManagement" >Customer Management</Link>
+                    <Link to="/customerMain" >Upload Bills</Link>
                   </li>
                   <li className="nav-item">
-                    <Link to="/customerBills" >Customer Bills</Link>
+                    <Link to="/gstStatus" >GST Status</Link>
                   </li>
                 </ul>
               </div>
@@ -69,11 +71,8 @@ class EmployeePage extends Component {
 }
 
 function mapStateToProps(state) {
-  const { allCustomers } = state.employee;
-  return {
-    allCustomers
-  };
+  return {};
 }
 
-const connectedEmployeePage = connect(mapStateToProps)(EmployeePage);
-export { connectedEmployeePage as EmployeePage };
+const connectedCustomerPage = connect(mapStateToProps)(CustomerPage);
+export { connectedCustomerPage as CustomerPage };

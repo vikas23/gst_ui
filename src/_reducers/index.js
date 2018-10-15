@@ -17,6 +17,9 @@ import {
 import {
   employee
 } from './employee.reducer';
+import {
+  customer
+} from './customer.reducer';
 
 const rootReducer = combineReducers({
   authentication,
@@ -24,6 +27,7 @@ const rootReducer = combineReducers({
   alert,
   employer,
   employee,
+  customer,
 });
 
 export default rootReducer;

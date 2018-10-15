@@ -17,6 +17,8 @@ export const employeeService = {
   getAllCustomers,
   createCustomer,
   updateCustomerDetails,
+  getCustomerBillData,
+  updateCustomerBillData,
 }
 
 function uploadFile(formData) {
@@ -55,4 +57,23 @@ function updateCustomerDetails(customerData) {
   };
 
   return fetch(`${config.apiUrl}/employee/updateCustomer`, requestOptions).then(handleResponse);
+}
+
+function getCustomerBillData(customerData) {
+  const requestOptions = {
+    method: 'GET',
+    headers: authHeader()
+  };
+
+  return fetch(`${config.apiUrl}/employee/getCustomerBillData/${customerData.phone}`, requestOptions).then(handleResponse);
+}
+
+function updateCustomerBillData(customerData) {
+  const requestOptions = {
+    method: 'POST',
+    headers: authHeader(),
+    body: JSON.stringify(customerData)
+  };
+
+  return fetch(`${config.apiUrl}/employee/updateCustomerBillData`, requestOptions).then(handleResponse);
 }

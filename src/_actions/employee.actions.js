@@ -13,6 +13,7 @@ export const employeeActions = {
   uploadFile,
   getAllCustomers,
   updateCustomerDetails,
+  getCustomerBillData,
 };
 
 function createCustomer(data) {
@@ -153,6 +154,38 @@ function updateCustomerDetails(data) {
   function failure(error) {
     return {
       type: employeeConstants.UPDATECUST_FAILURE,
+      error
+    }
+  }
+}
+
+function getCustomerBillData(data) {
+  return dispatch => {
+    dispatch(request(data));
+
+    employeeService.getCustomerBillData(data)
+      .then(
+        data => dispatch(success(data)),
+        error => dispatch(failure(error.toString()))
+      );
+  };
+
+  function request() {
+    return {
+      type: employeeConstants.GETCUSTBILL_REQUEST
+    }
+  }
+
+  function success(data) {
+    return {
+      type: employeeConstants.GETCUSTBILL_SUCCESS,
+      data
+    }
+  }
+
+  function failure(error) {
+    return {
+      type: employeeConstants.GETCUSTBILL_FAILURE,
       error
     }
   }

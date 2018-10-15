@@ -57,7 +57,7 @@ function handleResponse(response) {
       if (response.status === 401) {
         // auto logout if 401 response returned from api
         logout();
-        location.reload(true);
+        history.push('/login');
       }
 
       const error = (data && data.message) || response.statusText;

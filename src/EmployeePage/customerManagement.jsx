@@ -1,6 +1,10 @@
 import React, { Component } from "react";
-import { Table, Button, Modal, FormGroup } from "react-bootstrap";
+import { Table, Button, Modal } from "react-bootstrap";
 import { connect } from "react-redux";
+import DatePicker from 'react-datepicker';
+import moment from 'moment';
+import "../../node_modules/react-datepicker/dist/react-datepicker-cssmodules.css";
+import "./employee.css";
 
 import { employeeActions } from "../_actions";
 
@@ -57,7 +61,9 @@ class CustomerManagement extends Component {
       submitted: false,
       modalIsOpen: false,
       editModalIsOpen: false,
+      billModalIsOpen: false,
       file: null,
+      date: moment(),
       currentCustomer: {
         name: "",
         phone: "",
@@ -71,16 +77,24 @@ class CustomerManagement extends Component {
         businessNature: "",
         commoditiesName: "",
         propPhone: "",
-        propEmail: ""
+        propEmail: "",
+        dob: "",
+        emailId: "",
+        address: "",
+        photo: "",
+        gstn: ""
       }
     };
 
     this.handleChange = this.handleChange.bind(this);
+    this.handleChangeCust = this.handleChangeCust.bind(this);
+    this.handleChangeDate = this.handleChangeDate.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
     this.openModal = this.openModal.bind(this);
     this.closeModal = this.closeModal.bind(this);
     this.openEditModal = this.openEditModal.bind(this);
     this.closeEditModal = this.closeEditModal.bind(this);
+    this.closeUpdateModal = this.closeUpdateModal.bind(this);
     this.handleFileUpload = this.handleFileUpload.bind(this);
     this.submitFile = this.submitFile.bind(this);
   }
@@ -99,6 +113,13 @@ class CustomerManagement extends Component {
       }
     });
   }
+
+  handleChangeDate(date) {
+    this.setState({
+      date: date
+    })
+  }
+
   handleChangeCust(event) {
     const { name, value } = event.target;
     const { currentCustomer } = this.state;
@@ -143,8 +164,30 @@ class CustomerManagement extends Component {
         propEmail: cust.propEmail
       }
     });
+  }
 
+  openBillModal(event, cust) {
+    this.setState({ billModalIsOpen: true });
+    this.setState({
+      currentCustomer: {
+        ...this.state.currentCustomer
+      }
+    })
+  }
 
+  openUpdateModal(event, cust) {
+    this.setState({ updateModalIsOpen: true });
+    this.setState({
+      currentCustomer: {
+        ...this.state.currentCustomer,
+        dob: cust.dob,
+        emailId: cust.emailId,
+        phone: cust.phone,
+        address: cust.address,
+        photo: cust.photo,
+        gstn: cust.gstn
+      }
+    })
   }
 
   closeModal() {
@@ -155,6 +198,9 @@ class CustomerManagement extends Component {
     this.setState({ editModalIsOpen: false });
   }
 
+  closeUpdateModal() {
+    this.setState({ updateModalIsOpen: false });
+  }
   handleFileUpload(event, prefix) {
     const { name, value } = event.target;
     this.setState({ file: event.target.files });
@@ -178,7 +224,7 @@ class CustomerManagement extends Component {
   }
 
   render() {
-    const { allCustomer, uploadData } = this.props;
+    const { allCustomer } = this.props;
     const { customer, submitted, currentCustomer } = this.state;
 
     return (
@@ -198,7 +244,9 @@ class CustomerManagement extends Component {
                     <td>{emp.name}</td>
                     <td>{emp.phone}</td>
                     <td>
-                      <Button bsStyle="primary" onClick={(e) => this.openEditModal(event, emp)}>Edit Customer Info</Button>
+                      {/* <Button bsStyle="primary" onClick={(e) => this.openEditModal(evenopenUpdateModalt, emp)}>Edit Customer Info</Button> */}
+                      <Button bsStyle="primary" style={{ marginRight: "10px" }} onClick={(e) => this.openBillModal(event, emp)}>Add Bills</Button>
+                      <Button bsStyle="primary" onClick={(e) => this.openUpdateModal(event, emp)}>Update Customer Info</Button>
                     </td>
                   </tr>
                 ))}
@@ -237,9 +285,10 @@ class CustomerManagement extends Component {
               >
                 <label htmlFor="phone">Phone</label>
                 <input
-                  type="number"
+                  type="tel"
                   className="form-control"
                   name="phone"
+                  pattern="[0-9]{3}[0-9]{3}[0-9]{4}"
                   value={customer.phone}
                   onChange={this.handleChange}
                 />
@@ -251,7 +300,7 @@ class CustomerManagement extends Component {
               <div
                 className={
                   "form-group" +
-                  (submitted && !customer.passworclosed ? " has-error" : "")
+                  (submitted && !customer.password ? " has-error" : "")
                 }
               >
                 <label htmlFor="password">Password</label>
@@ -265,6 +314,25 @@ class CustomerManagement extends Component {
                 {submitted &&
                   !customer.password && (
                     <div className="help-block">Password is required</div>
+                  )}
+              </div>
+              <div
+                className={
+                  "form-group" +
+                  (submitted && !customer.gstn ? " has-error" : "")
+                }
+              >
+                <label htmlFor="password">Gstn</label>
+                <input
+                  type="text"
+                  className="form-control"
+                  name="gstn"
+                  value={customer.gstn}
+                  onChange={this.handleChange}
+                />
+                {submitted &&
+                  !customer.gstn && (
+                    <div className="help-block">Gst Number is required</div>
                   )}
               </div>
               <Modal.Footer>
@@ -289,15 +357,6 @@ class CustomerManagement extends Component {
                 handleChangeCust={this.handleChangeCust}
                 item={currentCustomer.firmName}
               />
-              <div className="form-group">
-                <label htmlFor="firmName">Name of firm</label>
-                <input
-                  type="text"
-                  name="firmName"
-                  value={currentCustomer.firmName}
-                  className="form-control"
-                  onChange={this.handleChangeCust}></input>
-              </div>
               <FieldGroupUpload
                 labelText="Photograph of Proprietor"
                 labelName="propPhoto"
@@ -363,18 +422,138 @@ class CustomerManagement extends Component {
               </Modal.Footer>
             </form>
           </Modal.Body>
-
         </Modal>
-      </div>
+        <Modal
+          show={this.state.updateModalIsOpen}
+          onHide={this.closeUpdateModal}
+        >
+          <Modal.Header closeButton>
+            <Modal.Title>Update Customer Details</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <form name="form" onSubmit={this.submitFile}>
+              <FieldGroup
+                labelName="name"
+                labelText="Name"
+                handleChangeCust={this.handleChangeCust}
+                item={currentCustomer.name}
+              />
+              <div className="form-group" style={{ marginBottom: "5px" }}>
+                <label >Date of Birth</label>
+                <br />
+                <DatePicker
+                  selected={currentCustomer.dob || this.state.date}
+                  onChange={this.handleChangeDate}
+                />
+              </div>
+              <FieldGroup
+                labelName="emailId"
+                labelText="Email Id"
+                handleChangeCust={this.handleChangeCust}
+                item={currentCustomer.emailId}
+              />
+              <FieldGroup
+                labelName="phone"
+                labelText="Contact Number"
+                handleChangeCust={this.handleChangeCust}
+                item={currentCustomer.phone}
+              />
+              <FieldGroup
+                labelName="address"
+                labelText="Address Firm"
+                handleChangeCust={this.handleChangeCust}
+                item={currentCustomer.address}
+              />
+              <FieldGroupUpload
+                labelText="Customer Photo"
+                labelName="photo"
+                item={currentCustomer.photo}
+                itemKey="RENT_AGREEMENT_OF_FIRM"
+                handleFileUpload={this.handleFileUpload}
+              />
+              <FieldGroup
+                labelName="gst"
+                labelText="GSTN"
+                handleChangeCust={this.handleChangeCust}
+                item={currentCustomer.gstn}
+              />
+              <Modal.Footer>
+                <Button onClick={this.closeUpdateModal}>Close</Button>
+                <Button bsStyle="primary" onClick={this.submitFile}>Save changes</Button>
+              </Modal.Footer>
+            </form>
+          </Modal.Body>
+        </Modal>
+        <Modal
+          show={this.state.updateModalIsOpen}
+          onHide={this.closeUpdateModal}
+        >
+          <Modal.Header closeButton>
+            <Modal.Title>Update Customer Details</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <form name="form" onSubmit={this.submitFile}>
+              <FieldGroup
+                labelName="name"
+                labelText="Name"
+                handleChangeCust={this.handleChangeCust}
+                item={currentCustomer.name}
+              />
+              <div className="form-group" style={{ marginBottom: "5px" }}>
+                <label >Date of Birth</label>
+                <br />
+                <DatePicker
+                  selected={currentCustomer.dob || this.state.date}
+                  onChange={this.handleChangeDate}
+                />
+              </div>
+              <FieldGroup
+                labelName="emailId"
+                labelText="Email Id"
+                handleChangeCust={this.handleChangeCust}
+                item={currentCustomer.emailId}
+              />
+              <FieldGroup
+                labelName="phone"
+                labelText="Contact Number"
+                handleChangeCust={this.handleChangeCust}
+                item={currentCustomer.phone}
+              />
+              <FieldGroup
+                labelName="address"
+                labelText="Address Firm"
+                handleChangeCust={this.handleChangeCust}
+                item={currentCustomer.address}
+              />
+              <FieldGroupUpload
+                labelText="Customer Photo"
+                labelName="photo"
+                item={currentCustomer.photo}
+                itemKey="RENT_AGREEMENT_OF_FIRM"
+                handleFileUpload={this.handleFileUpload}
+              />
+              <FieldGroup
+                labelName="gst"
+                labelText="GSTN"
+                handleChangeCust={this.handleChangeCust}
+                item={currentCustomer.gstn}
+              />
+              <Modal.Footer>
+                <Button onClick={this.closeUpdateModal}>Close</Button>
+                <Button bsStyle="primary" onClick={this.submitFile}>Save changes</Button>
+              </Modal.Footer>
+            </form>
+          </Modal.Body>
+        </Modal>
+      </div >
     );
   }
 }
 
 function mapStateToProps(state) {
-  const { allCustomer, uploadData } = state.employee;
+  const { allCustomer } = state.employee;
   return {
-    allCustomer,
-    uploadData
+    allCustomer
   };
 }
 

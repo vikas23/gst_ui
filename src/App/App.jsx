@@ -1,4 +1,5 @@
 import '../../node_modules/bootstrap/dist/css/bootstrap.min.css';
+import '../../node_modules/react-datepicker/dist/react-datepicker.css';
 import React from "react";
 import { Router, Route } from "react-router-dom";
 import { connect } from "react-redux";
@@ -10,6 +11,7 @@ import { LoginPage } from "../LoginPage";
 import { RegisterPage } from "../RegisterPage";
 import { EmployerPage } from "../EmployerPage";
 import { EmployeePage } from "../EmployeePage";
+import { CustomerPage } from "../CustomerPage";
 
 class App extends React.Component {
   constructor(props) {
@@ -35,6 +37,7 @@ class App extends React.Component {
             <Route path="/login" component={LoginPage} />
             <Route path="/registerEmployer" component={RegisterPage} />
             <Route path="/customerManagement" component={EmployeePage} />
+            <Route path="/customerMain" component={CustomerPage} />
           </div>
         </Router>
       </div>
