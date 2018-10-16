@@ -30,4 +30,12 @@ class EmployerLicense extends Component {
   }
 }
 
-export default EmployerLicense;
+function mapStateToProps(state) {
+  const { allEmployees } = state.employer;
+  return {
+    allEmployees
+  };
+}
+
+const connectedEmployerLicense = connect(mapStateToProps)(EmployerLicense);
+export { connectedEmployerLicense as EmployerLicense };
