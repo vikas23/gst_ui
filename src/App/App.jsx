@@ -3,6 +3,7 @@ import '../../node_modules/react-datepicker/dist/react-datepicker.css';
 import React from "react";
 import { Router, Route } from "react-router-dom";
 import { connect } from "react-redux";
+import { _ } from "lodash"
 
 import { history } from "../_helpers";
 import { alertActions } from "../_actions";
