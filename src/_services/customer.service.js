@@ -24,8 +24,6 @@ function uploadBills(billData) {
     headers: authHeader(),
     body: JSON.stringify(billData)
   };
-  console.log(requestOptions);
-  console.log("Herereere");
   return fetch(`${config.apiUrl}/employee/updateCustomerBillData`, requestOptions).then(handleResponse);
 }
 

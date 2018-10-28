@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Table, Button, Modal, FormGroup, Radio } from "react-bootstrap";
+import { Table, Button, Modal, FormGroup, Radio, Carousel } from "react-bootstrap";
 import { connect } from "react-redux";
 import DatePicker from 'react-datepicker';
 import moment from 'moment';
@@ -37,7 +37,9 @@ class UploadBills extends Component {
         billDate: moment.utc(),
         billType: BILLTYPE.PURCHASE
       },
-      modalIsOpen: false
+      modalIsOpen: false,
+      carouselModalIsOpen: false,
+      billLocaltion: []
     };
 
     this.openModal = this.openModal.bind(this);
@@ -45,6 +47,11 @@ class UploadBills extends Component {
     this.closeModal = this.closeModal.bind(this);
     this.handleChangeDate = this.handleChangeDate.bind(this);
     this.handleFileUpload = this.handleFileUpload.bind(this);
+    this.handleCarousel = this.handleCarousel.bind(this);
+  }
+
+  componentDidMount() {
+    this.props.dispatch(employeeActions.getCustomerBillData({ phone: user.phone }));
   }
 
   openModal() {
@@ -61,7 +68,6 @@ class UploadBills extends Component {
       billLocation: cust.billLocaltion
     }
     if (cust) {
-      console.log(payload);
       this.props.dispatch(customerActions.uploadBills(payload));
     }
   }
@@ -79,7 +85,10 @@ class UploadBills extends Component {
     const { name, value } = event.target;
     this.setState({ file: event.target.files });
     const formData = new FormData();
-    formData.append("file", event.target.files[0]);
+    event.target.files
+    _.each(event.target.files, (file) => {
+      formData.append("file", file);
+    });
     formData.append("name", user.name);
     formData.append("phone", user.phone);
     formData.append("filePrefix", prefix);
@@ -87,8 +96,10 @@ class UploadBills extends Component {
     const { cust } = this.state;
     this.props.dispatch(employeeActions.uploadFile(formData, function (data) {
       const { uploadData } = data;
-      console.log(uploadData)
-      const billLocaltion = uploadData.Location;
+      const billLocaltion = [];
+      _.each(uploadData, (data) => {
+        billLocaltion.push(data.Location);
+      });
       self.setState({
         cust: {
           ...cust,
@@ -98,15 +109,22 @@ class UploadBills extends Component {
     }));
   }
 
+  handleCarousel(e, billLocaltion) {
+    console.log("Billl Localtion");
+    console.log(billLocaltion);
+    this.setState({ carouselModalIsOpen: true });
+    this.setState({ billLocaltion });
+  };
+
   closeModal() {
-    this.setState({ modalIsOpen: false })
+    this.setState({ modalIsOpen: false });
+    this.setState({ carouselModalIsOpen: false });
   }
 
   render() {
     const { billData } = this.props;
-    let bills;
-    if (billData) { bills = billData.bills };
-    const { cust } = this.state;
+    const { cust, billLocaltion } = this.state;
+    const that = this;
     return (
       <div>
         <Table responsive>
@@ -114,33 +132,31 @@ class UploadBills extends Component {
             <tr>
               <th>Bill Date</th>
               <th>Bill Type</th>
-              <th>Total Bill</th>
               <th>View Bills</th>
             </tr>
           </thead>
           <tbody>
-            {bills && Object.keys(bills).map(bDate => (
-              <tr key={bDate}>
-                <td>
-                  <div className="form-group">
-                    <label >moment(bDate)</label>
-                  </div>
-                </td>
-                <td>
-                  <div className="form-group">
-                    <input
-                      type="text"
-                      value={bills[bDate].totalBill}
-                    />
-                  </div>
-                </td>
-                <td>
-                  <div className="form-group">
-                    <a href="">View Bills</a>
-                  </div>
-                </td>
-              </tr>
-            ))}
+            {billData
+              && billData.length
+              && billData.map(bill => (
+                <tr key={bill._id}>
+                  <td>
+                    <div className="form-group">
+                      <label >{moment(bill.billDate).local().format('YYYY-MM-DD')}</label>
+                    </div>
+                  </td>
+                  <td>
+                    <div className="form-group">
+                      <label>{bill.billType}</label>
+                    </div>
+                  </td>
+                  <td>
+                    <div className="form-group">
+                      <Button bsStyle="link" onClick={(e) => this.handleCarousel(e, bill.billLocation)}>View Bills</Button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
           </tbody>
         </Table>
 
@@ -181,6 +197,25 @@ class UploadBills extends Component {
             </form>
           </Modal.Body>
         </Modal>
+        {/* <Modal */}
+        {/* onHide={this.closeModal} */}
+        >
+          {/* <Modal.Body> */}
+        <Carousel
+          show={this.state.carouselModalIsOpen}
+        >
+          {[1, 2, 3].map((data) => {
+            <Carousel.Item>
+              <img width={900} height={500} alt="900x500" src="https://emp1-9886937016.s3.amazonaws.com/Cust1-9886937018/undefined-1540059526681-Modified_Type.png" />
+            </Carousel.Item>
+          })}
+
+          {/* {billLocaltion.map((imgLocal) => {
+
+          })} */}
+        </Carousel>
+        {/* </Modal.Body> */}
+        {/* </Modal> */}
       </div>
     );
   }
@@ -188,7 +223,7 @@ class UploadBills extends Component {
 
 
 function mapStateToProps(state) {
-  const { billData } = state.customer;
+  const { billData } = state.employee;
   return {
     billData
   };

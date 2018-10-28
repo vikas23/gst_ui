@@ -10,7 +10,7 @@ module.exports = merge(common, {
   externals: {
     // global app config object
     config: JSON.stringify({
-      apiUrl: 'https://{api}/api/v1'
+      apiUrl: 'https://192.168.0.10/api/v1'
     })
   }
 });
