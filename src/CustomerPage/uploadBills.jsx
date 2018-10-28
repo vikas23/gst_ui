@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Table, Button, Modal, FormGroup, Radio, Carousel } from "react-bootstrap";
+import { Table, Button, Modal, FormGroup, Radio } from "react-bootstrap";
 import { connect } from "react-redux";
 import DatePicker from 'react-datepicker';
 import moment from 'moment';
@@ -110,8 +110,6 @@ class UploadBills extends Component {
   }
 
   handleCarousel(e, billLocaltion) {
-    console.log("Billl Localtion");
-    console.log(billLocaltion);
     this.setState({ carouselModalIsOpen: true });
     this.setState({ billLocaltion });
   };
@@ -197,25 +195,6 @@ class UploadBills extends Component {
             </form>
           </Modal.Body>
         </Modal>
-        {/* <Modal */}
-        {/* onHide={this.closeModal} */}
-        >
-          {/* <Modal.Body> */}
-        <Carousel
-          show={this.state.carouselModalIsOpen}
-        >
-          {[1, 2, 3].map((data) => {
-            <Carousel.Item>
-              <img width={900} height={500} alt="900x500" src="https://emp1-9886937016.s3.amazonaws.com/Cust1-9886937018/undefined-1540059526681-Modified_Type.png" />
-            </Carousel.Item>
-          })}
-
-          {/* {billLocaltion.map((imgLocal) => {
-
-          })} */}
-        </Carousel>
-        {/* </Modal.Body> */}
-        {/* </Modal> */}
       </div>
     );
   }

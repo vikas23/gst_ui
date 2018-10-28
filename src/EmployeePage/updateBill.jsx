@@ -1,8 +1,10 @@
 import React, { Component } from 'react';
 import { Table, Button } from "react-bootstrap";
 import { connect } from "react-redux";
+import Lightbox from 'react-image-lightbox';
+import 'react-image-lightbox/style.css';
 import moment from 'moment';
-import "../../node_modules/react-datepicker/dist/react-datepicker-cssmodules.css";
+import "react-datepicker/dist/react-datepicker-cssmodules.css";
 import "./employee.css";
 
 import { employeeActions } from "../_actions";
@@ -12,15 +14,25 @@ class UpdateBill extends Component {
     super(props);
     this.state = {
       currentCustBills: {},
-      customerPhone: ""
+      customerPhone: "",
+      photoIndex: 0
     };
     this.handleChange = this.handleChange.bind(this);
     this.onCustomerPhoneSubmit = this.onCustomerPhoneSubmit.bind(this);
+    this.openImageViewer = this.openImageViewer.bind(this);
   }
 
   onCustomerPhoneSubmit() {
     const { customerPhone } = this.state;
     this.props.dispatch(employeeActions.getCustomerBillData({ phone: customerPhone }));
+  }
+
+  openImageViewer(currentBills) {
+    this.setState({
+      isOpen: true,
+      currentCustBills: currentBills,
+      photoIndex: 0,
+    })
   }
 
   handleChange(event) {
@@ -43,7 +55,7 @@ class UpdateBill extends Component {
     const { billData } = this.props;
     let bills;
     // if (billData) { bills = billData.bills };
-    const { customerPhone } = this.state;
+    const { customerPhone, isOpen, currentCustBills, photoIndex } = this.state;
     return (
       <div>
         <form name="uploadBillForm" onSubmit={this.onCustomerPhoneSubmit}>
@@ -85,7 +97,7 @@ class UpdateBill extends Component {
                     </td>
                     <td>
                       <div className="form-group">
-                        <a target="_blank" href={bill.billLocation}>View Bill</a>
+                        <Button bsStyle="link" onClick={(e) => this.openImageViewer(bill.billLocation)}>View Bill</Button>
                       </div>
                     </td>
                   </tr>
@@ -93,6 +105,24 @@ class UpdateBill extends Component {
             </tbody>
           </Table>
         </div>
+        {isOpen && (
+          <Lightbox
+            mainSrc={currentCustBills[photoIndex]}
+            nextSrc={currentCustBills[(photoIndex + 1) % currentCustBills.length]}
+            prevSrc={currentCustBills[(photoIndex + currentCustBills.length - 1) % currentCustBills.length]}
+            onCloseRequest={() => this.setState({ isOpen: false })}
+            onMovePrevRequest={() =>
+              this.setState({
+                photoIndex: (photoIndex + currentCustBills.length - 1) % currentCustBills.length,
+              })
+            }
+            onMoveNextRequest={() =>
+              this.setState({
+                photoIndex: (photoIndex + 1) % currentCustBills.length,
+              })
+            }
+          />
+        )}
       </div>
     );
   }
