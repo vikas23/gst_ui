@@ -14,7 +14,7 @@ export const employerActions = {
   setLicense
 };
 
-function registerEmployee(data) {
+function registerEmployee(data, callback) {
   return dispatch => {
     dispatch(request(data));
 
@@ -23,6 +23,7 @@ function registerEmployee(data) {
         data => {
           dispatch(success());
           dispatch(alertActions.success('Employee Successfully Created'));
+          callback();
         },
         error => {
           dispatch(failure(error.toString()));
@@ -60,7 +61,10 @@ function getAllEmployees() {
     employerService.getAllEmployees()
       .then(
         data => dispatch(success(data)),
-        error => dispatch(failure(error.toString()))
+        error => {
+          dispatch(failure(error.toString()));
+          dispatch(alertActions.error(error.toString()));
+        }
       );
   };
 
@@ -93,7 +97,10 @@ function setLicense() {
     employerService.setLicense()
       .then(
         data => dispatch(success(data)),
-        error => dispatch(failure(error.toString()))
+        error => {
+          dispatch(failure(error.toString()));
+          dispatch(alertActions.error(error.toString()));
+        }
       );
   };
 

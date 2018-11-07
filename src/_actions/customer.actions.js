@@ -100,7 +100,10 @@ function checkGstStatus() {
     customerService.checkGstStatus()
       .then(
         data => dispatch(success(data)),
-        error => dispatch(failure(error.toString()))
+        error => {
+          dispatch(failure(error.toString()));
+          dispatch(alertActions.error(error.toString()));
+        }
       );
   };
 

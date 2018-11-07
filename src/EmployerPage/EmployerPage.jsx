@@ -2,7 +2,7 @@ import React from "react";
 import { connect } from "react-redux";
 import { BrowserRouter as Router, Route, Link } from "react-router-dom";
 import { EmployeeManagement } from "./employeeMangement";
-import EmployerLicense from "./employerLicense";
+import { EmployerLicense } from "./employerLicense";
 import { Navbar, NavItem, Nav } from "react-bootstrap";
 import { userActions } from "../_actions";
 

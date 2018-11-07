@@ -44,12 +44,22 @@ class EmployeeManagement extends React.Component {
     this.setState({ submitted: true });
     const { employee } = this.state;
     if (employee.name && employee.phone && employee.password) {
-      this.props.dispatch(employerActions.registerEmployee(employee));
+      this.props.dispatch(employerActions.registerEmployee(employee, () => {
+        this.props.dispatch(employerActions.getAllEmployees());
+        this.closeModal();
+      }));
     }
   }
 
   openModal() {
-    this.setState({ modalIsOpen: true });
+    this.setState({
+      modalIsOpen: true,
+      employee: {
+        name: "",
+        phone: "",
+        password: ""
+      }
+    });
   }
 
   closeModal() {
@@ -61,8 +71,8 @@ class EmployeeManagement extends React.Component {
 
     return (
       <div>
-        {allEmployees &&
-          allEmployees.length && (
+        {!!allEmployees &&
+          !!allEmployees.length && (
             <Table responsive>
               <thead>
                 <tr>

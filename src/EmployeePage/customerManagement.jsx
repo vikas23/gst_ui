@@ -61,7 +61,6 @@ class CustomerManagement extends Component {
       submitted: false,
       modalIsOpen: false,
       editModalIsOpen: false,
-      billModalIsOpen: false,
       file: null,
       date: moment(),
       currentCustomer: {
@@ -136,7 +135,10 @@ class CustomerManagement extends Component {
     this.setState({ submitted: true });
     const { customer } = this.state;
     if (customer.name && customer.phone && customer.password) {
-      this.props.dispatch(employeeActions.createCustomer(customer));
+      this.props.dispatch(employeeActions.createCustomer(customer, () => {
+        this.props.dispatch(employeeActions.getAllCustomers());
+        this.closeModal();
+      }));
     }
   }
 
@@ -164,15 +166,6 @@ class CustomerManagement extends Component {
         propEmail: cust.propEmail
       }
     });
-  }
-
-  openBillModal(event, cust) {
-    this.setState({ billModalIsOpen: true });
-    this.setState({
-      currentCustomer: {
-        ...this.state.currentCustomer
-      }
-    })
   }
 
   openUpdateModal(event, cust) {
@@ -220,7 +213,7 @@ class CustomerManagement extends Component {
 
   submitFile(event) {
     event.preventDefault();
-    this.props.dispatch(employeeActions.updateCustomerDetails(this.state.currentCustomer))
+    this.props.dispatch(employeeActions.updateCustomerDetails(this.state.currentCustomer));
   }
 
   render() {
@@ -229,8 +222,8 @@ class CustomerManagement extends Component {
 
     return (
       <div>
-        {allCustomer &&
-          allCustomer.length && (
+        {!!allCustomer &&
+          !!allCustomer.length && (
             <Table responsive>
               <thead>
                 <tr>
@@ -244,9 +237,7 @@ class CustomerManagement extends Component {
                     <td>{emp.name}</td>
                     <td>{emp.phone}</td>
                     <td>
-                      {/* <Button bsStyle="primary" onClick={(e) => this.openEditModal(evenopenUpdateModalt, emp)}>Edit Customer Info</Button> */}
-                      <Button bsStyle="primary" style={{ marginRight: "10px" }} onClick={(e) => this.openBillModal(event, emp)}>Add Bills</Button>
-                      <Button bsStyle="primary" onClick={(e) => this.openUpdateModal(event, emp)}>Update Customer Info</Button>
+                      {/* <Button bsStyle="primary" onClick={(e) => this.openUpdateModal(event, emp)}>Update Customer Info</Button> */}
                     </td>
                   </tr>
                 ))}
@@ -262,7 +253,7 @@ class CustomerManagement extends Component {
             <Modal.Title>Create Customer</Modal.Title>
           </Modal.Header>
           <Modal.Body>
-            <form name="form" onSubmit={this.handleSubmit}>
+            <form name="form">
               <div className={"form-group" + (submitted ? " has-error" : "")}>
                 <label htmlFor="name">Name</label>
                 <input

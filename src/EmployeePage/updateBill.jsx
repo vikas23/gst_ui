@@ -58,7 +58,7 @@ class UpdateBill extends Component {
     const { customerPhone, isOpen, currentCustBills, photoIndex } = this.state;
     return (
       <div>
-        <form name="uploadBillForm" onSubmit={this.onCustomerPhoneSubmit}>
+        <form name="uploadBillForm">
           <div className="form-group">
             <label htmlFor="custPhone" style={{ float: "left", textAlign: "center", lineHeight: "250%", marginRight: "15px" }}>Enter Customer Phone: </label>
             <input
@@ -81,8 +81,8 @@ class UpdateBill extends Component {
               </tr>
             </thead>
             <tbody>
-              {billData &&
-                billData.length &&
+              {!!billData &&
+                !!billData.length &&
                 billData.map(bill => (
                   <tr key={bill._id}>
                     <td>

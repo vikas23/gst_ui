@@ -16,7 +16,7 @@ export const employeeActions = {
   getCustomerBillData,
 };
 
-function createCustomer(data) {
+function createCustomer(data, callback) {
   return dispatch => {
     dispatch(request(data));
 
@@ -25,6 +25,7 @@ function createCustomer(data) {
         data => {
           dispatch(success(data));
           dispatch(alertActions.success('Customer Profile Successfully Created'));
+          callback();
         },
         error => {
           dispatch(failure(error.toString()));
@@ -102,7 +103,10 @@ function getAllCustomers() {
     employeeService.getAllCustomers()
       .then(
         data => dispatch(success(data)),
-        error => dispatch(failure(error.toString()))
+        error => {
+          dispatch(failure(error.toString()));
+          dispatch(alertActions.error(error.toString()));
+        }
       );
   };
 
@@ -134,7 +138,10 @@ function updateCustomerDetails(data) {
     employeeService.updateCustomerDetails(data)
       .then(
         data => dispatch(success(data)),
-        error => dispatch(failure(error.toString()))
+        error => {
+          dispatch(failure(error.toString()));
+          dispatch(alertActions.error(error.toString()));
+        }
       );
   };
 
@@ -166,7 +173,10 @@ function getCustomerBillData(data) {
     employeeService.getCustomerBillData(data)
       .then(
         data => dispatch(success(data)),
-        error => dispatch(failure(error.toString()))
+        error => {
+          dispatch(failure(error.toString()));
+          dispatch(alertActions.error(error.toString()));
+        }
       );
   };
 

@@ -134,8 +134,8 @@ class UploadBills extends Component {
             </tr>
           </thead>
           <tbody>
-            {billData
-              && billData.length
+            {!!billData
+              && !!billData.length
               && billData.map(bill => (
                 <tr key={bill._id}>
                   <td>

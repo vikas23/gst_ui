@@ -20,13 +20,14 @@ class EmployerLicense extends Component {
   }
   render() {
     return (
-      <form name="LicenseForm" onSubmit={this.handleSubmit}>
-        <FormGroup controlId="formControlsTextarea">
-          <ControlLabel>Enter License</ControlLabel>
-          <FormControl componentClass="textarea" placeholder="textarea" />
-        </FormGroup>
-      </form>
-
+      <div>
+        <form name="LicenseForm" onSubmit={this.handleSubmit}>
+          <FormGroup controlId="formControlsTextarea">
+            <ControlLabel>Enter License</ControlLabel>
+            <FormControl componentClass="textarea" placeholder="textarea" />
+          </FormGroup>
+        </form>
+      </div>
     );
   }
 }
