@@ -6,8 +6,6 @@ import moment from 'moment';
 import "../../node_modules/react-datepicker/dist/react-datepicker-cssmodules.css";
 import { customerActions, employeeActions } from "../_actions";
 
-const user = JSON.parse(localStorage.getItem("user"));
-
 const BILLTYPE = {
   PURCHASE: 'purchase',
   SALES: 'sales'
@@ -51,6 +49,7 @@ class UploadBills extends Component {
   }
 
   componentDidMount() {
+    const user = JSON.parse(localStorage.getItem("user"));
     this.props.dispatch(employeeActions.getCustomerBillData({ phone: user.phone }));
   }
 
