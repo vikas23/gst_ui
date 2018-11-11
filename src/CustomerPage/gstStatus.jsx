@@ -26,16 +26,22 @@ class GstStatus extends Component {
         if (!monthYearObj[monthYear]) {
           monthYearObj[monthYear] = {
             totalGst: 0,
-            totalBill: 0
+            totalPBill: 0,
+            totalSBill: 0
           };
         }
-        bill.totalBill && (monthYearObj[monthYear].totalBill += +bill.totalBill);
+        if (bill.billType === "sales") {
+          bill.totalBill && (monthYearObj[monthYear].totalSBill += +bill.totalBill);
+        } else {
+          bill.totalBill && (monthYearObj[monthYear].totalPBill += +bill.totalBill);
+        }
         bill.totalGst && (monthYearObj[monthYear].totalGst += +bill.totalGst);
       });
       _.each(monthYearObj, (val, key) => {
         let obj = {
           month: key,
-          totalBill: val.totalBill,
+          totalSBill: val.totalSBill,
+          totalPBill: val.totalPBill,
           totalGst: val.totalGst
         };
         billTableData.push(obj);
@@ -52,7 +58,8 @@ class GstStatus extends Component {
           <thead>
             <tr>
               <th>Month</th>
-              <th>Total Bill</th>
+              <th>Total Sales Bill</th>
+              <th>Total Purchase Bill</th>
               <th>Total GST</th>
             </tr>
           </thead>
@@ -61,17 +68,22 @@ class GstStatus extends Component {
               && !!billTableData.length
               && billTableData.map(bill => (
                 <tr key={bill.month}>
-                  <td>
+                  <td className="col-md-2">
                     <div className="form-group">
                       <label >{bill.month}</label>
                     </div>
                   </td>
-                  <td>
+                  <td className="col-md-2">
                     <div className="form-group">
-                      <label>Rs. {bill.totalBill}</label>
+                      <label>Rs. {bill.totalSBill}</label>
                     </div>
                   </td>
-                  <td>
+                  <td className="col-md-2">
+                    <div className="form-group">
+                      <label>Rs. {bill.totalPBill}</label>
+                    </div>
+                  </td>
+                  <td className="col-md-2">
                     <div className="form-group">
                       <label>Rs. {bill.totalGst}</label>
                     </div>
