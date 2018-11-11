@@ -3,6 +3,7 @@ import { Table, Button, Modal, FormGroup, Radio } from "react-bootstrap";
 import { connect } from "react-redux";
 import DatePicker from 'react-datepicker';
 import moment from 'moment';
+import Lightbox from 'react-image-lightbox';
 import "../../node_modules/react-datepicker/dist/react-datepicker-cssmodules.css";
 import { customerActions, employeeActions } from "../_actions";
 
@@ -39,7 +40,9 @@ class UploadBills extends Component {
       },
       modalIsOpen: false,
       carouselModalIsOpen: false,
-      billLocaltion: []
+      billLocaltion: [],
+      currentCustBills: {},
+      photoIndex: 0
     };
 
     this.openModal = this.openModal.bind(this);
@@ -47,12 +50,20 @@ class UploadBills extends Component {
     this.closeModal = this.closeModal.bind(this);
     this.handleChangeDate = this.handleChangeDate.bind(this);
     this.handleFileUpload = this.handleFileUpload.bind(this);
-    this.handleCarousel = this.handleCarousel.bind(this);
+    this.openImageViewer = this.openImageViewer.bind(this);
   }
 
   componentDidMount() {
     user = JSON.parse(localStorage.getItem("user"));
     this.props.dispatch(employeeActions.getCustomerBillData({ phone: user.phone }));
+  }
+
+  openImageViewer(currentBills) {
+    this.setState({
+      isOpen: true,
+      currentCustBills: currentBills,
+      photoIndex: 0,
+    })
   }
 
   openModal() {
@@ -69,7 +80,10 @@ class UploadBills extends Component {
       billLocation: cust.billLocaltion
     }
     if (cust) {
-      this.props.dispatch(customerActions.uploadBills(payload));
+      this.props.dispatch(customerActions.uploadBills(payload, () => {
+        this.props.dispatch(employeeActions.getCustomerBillData({ phone: user.phone }));
+        this.closeModal();
+      }));
     }
   }
 
@@ -83,7 +97,6 @@ class UploadBills extends Component {
   }
 
   handleFileUpload(event, prefix) {
-    const { name, value } = event.target;
     this.setState({ file: event.target.files });
     const formData = new FormData();
     event.target.files
@@ -107,23 +120,19 @@ class UploadBills extends Component {
           billLocaltion
         }
       });
+      self.setState({ isFileUploaded: true })
     }));
   }
-
-  handleCarousel(e, billLocaltion) {
-    this.setState({ carouselModalIsOpen: true });
-    this.setState({ billLocaltion });
-  };
 
   closeModal() {
     this.setState({ modalIsOpen: false });
     this.setState({ carouselModalIsOpen: false });
+    this.setState({ isFileUploaded: false });
   }
 
   render() {
     const { billData } = this.props;
-    const { cust, billLocaltion } = this.state;
-    const that = this;
+    const { cust, isOpen, currentCustBills, photoIndex } = this.state;
     return (
       <div>
         <Table responsive>
@@ -151,7 +160,7 @@ class UploadBills extends Component {
                   </td>
                   <td>
                     <div className="form-group">
-                      <Button bsStyle="link" onClick={(e) => this.handleCarousel(e, bill.billLocation)}>View Bills</Button>
+                      <Button bsStyle="link" onClick={(e) => this.openImageViewer(bill.billLocation)}>{(bill.billLocation && bill.billLocation.length) || 0} Available</Button>
                     </div>
                   </td>
                 </tr>
@@ -190,12 +199,33 @@ class UploadBills extends Component {
                 item={cust.bill}
               />
               <Modal.Footer>
-                <Button onClick={this.closeEditModal}>Close</Button>
-                <Button bsStyle="primary" onClick={this.handleSubmit}>Save changes</Button>
+                <Button onClick={this.closeModal}>Close</Button>
+                <Button bsStyle="primary" onClick={this.handleSubmit} disabled={!this.state.isFileUploaded}>Save changes</Button>
               </Modal.Footer>
             </form>
           </Modal.Body>
         </Modal>
+        {isOpen && (
+          <Lightbox
+            mainSrc={currentCustBills[photoIndex]}
+            nextSrc={currentCustBills[(photoIndex + 1) % currentCustBills.length]}
+            prevSrc={currentCustBills[(photoIndex + currentCustBills.length - 1) % currentCustBills.length]}
+            onCloseRequest={() => this.setState({ isOpen: false })}
+            onMovePrevRequest={() => {
+              if (!photoIndex) return false
+              this.setState({
+                photoIndex: (photoIndex + currentCustBills.length - 1) % currentCustBills.length,
+              })
+            }
+            }
+            onMoveNextRequest={() => {
+              if (photoIndex === currentCustBills.length - 1) return false;
+              this.setState({
+                photoIndex: (photoIndex + 1) % currentCustBills.length,
+              })
+            }}
+          />
+        )}
       </div>
     );
   }

@@ -12,9 +12,10 @@ export const customerActions = {
   uploadBills,
   updateBills,
   checkGstStatus,
+  updateBillData,
 };
 
-function uploadBills(data) {
+function uploadBills(data, callback) {
   return dispatch => {
     dispatch(request(data));
 
@@ -22,6 +23,7 @@ function uploadBills(data) {
       .then(
         data => {
           dispatch(success(data));
+          callback();
           dispatch(alertActions.success('Bill Upload Successfully'));
         },
         error => {
@@ -123,6 +125,41 @@ function checkGstStatus() {
   function failure(error) {
     return {
       type: customerConstants.CHECKGST_FAILURE,
+      error
+    }
+  }
+}
+
+function updateBillData(data) {
+  return dispatch => {
+    dispatch(request());
+
+    customerService.updateBillData(data)
+      .then(
+        data => dispatch(success(data)),
+        error => {
+          dispatch(failure(error.toString()));
+          dispatch(alertActions.error(error.toString()));
+        }
+      );
+  };
+
+  function request() {
+    return {
+      type: customerConstants.UPDATEBILLDATA_REQUEST
+    }
+  }
+
+  function success(data) {
+    return {
+      type: customerConstants.UPDATEBILLDATA_SUCCESS,
+      data
+    }
+  }
+
+  function failure(error) {
+    return {
+      type: customerConstants.UPDATEBILLDATA_FAILURE,
       error
     }
   }

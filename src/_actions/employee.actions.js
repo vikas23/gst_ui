@@ -166,13 +166,16 @@ function updateCustomerDetails(data) {
   }
 }
 
-function getCustomerBillData(data) {
+function getCustomerBillData(data, callback) {
   return dispatch => {
     dispatch(request(data));
 
     employeeService.getCustomerBillData(data)
       .then(
-        data => dispatch(success(data)),
+        data => {
+          dispatch(success(data))
+          callback()
+        },
         error => {
           dispatch(failure(error.toString()));
           dispatch(alertActions.error(error.toString()));

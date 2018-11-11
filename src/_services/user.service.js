@@ -1,4 +1,8 @@
 import config from 'config';
+import {
+  history
+} from '../_helpers';
+
 
 export const userService = {
   login,

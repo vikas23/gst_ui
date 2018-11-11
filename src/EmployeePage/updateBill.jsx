@@ -7,13 +7,14 @@ import moment from 'moment';
 import "react-datepicker/dist/react-datepicker-cssmodules.css";
 import "./employee.css";
 
-import { employeeActions } from "../_actions";
+import { employeeActions, customerActions } from "../_actions";
 
 class UpdateBill extends Component {
   constructor(props) {
     super(props);
     this.state = {
       currentCustBills: {},
+      billData: {},
       customerPhone: "",
       photoIndex: 0
     };
@@ -51,10 +52,16 @@ class UpdateBill extends Component {
     }
   }
 
+  submitCustBillData(event, bill) {
+    event.preventDefault();
+    const payload = {
+      billData: bill
+    };
+    this.props.dispatch(customerActions.updateBillData(payload));
+  }
+
   render() {
     const { billData } = this.props;
-    let bills;
-    // if (billData) { bills = billData.bills };
     const { customerPhone, isOpen, currentCustBills, photoIndex } = this.state;
     return (
       <div>
@@ -78,6 +85,8 @@ class UpdateBill extends Component {
                 <th>Bill Date</th>
                 <th>Bill Type</th>
                 <th>View Bills</th>
+                <th>Total Bill</th>
+                <th>Total GST</th>
               </tr>
             </thead>
             <tbody>
@@ -85,19 +94,46 @@ class UpdateBill extends Component {
                 !!billData.length &&
                 billData.map(bill => (
                   <tr key={bill._id}>
-                    <td>
+                    <td className="col-md-2">
                       <div className="form-group">
                         <label >{moment(bill.billDate).local().format('YYYY-MM-DD')}</label>
                       </div>
                     </td>
-                    <td>
+                    <td className="col-md-2">
                       <div className="form-group">
                         <label>{bill.billType}</label>
                       </div>
                     </td>
-                    <td>
+                    <td className="col-md-2">
                       <div className="form-group">
-                        <Button bsStyle="link" onClick={(e) => this.openImageViewer(bill.billLocation)}>View Bill</Button>
+                        <Button bsStyle="link" onClick={(e) => this.openImageViewer(bill.billLocation)}>{(bill.billLocation && bill.billLocation.length || 0)} Available</Button>
+                      </div>
+                    </td>
+                    <td className="col-md-2">
+                      <div className="form-group">
+                        <input
+                          type="number"
+                          className="form-control"
+                          style={{ width: "50%" }}
+                          value={bill.totalBill}
+                          onChange={(e) => bill.totalBill = e.target.value} />
+                      </div>
+                    </td>
+                    <td className="col-md-2">
+                      <div className="form-group">
+                        <input
+                          type="number"
+                          className="form-control"
+                          style={{ width: "50%" }}
+                          value={bill.totalGst}
+                          onChange={(e) => {
+                            bill.totalGst = e.target.value
+                          }} />
+                      </div>
+                    </td>
+                    <td className="col-md-2">
+                      <div className="form-group">
+                        <Button bsStyle="primary" onClick={(e) => this.submitCustBillData(e, bill)}>Submit</Button>
                       </div>
                     </td>
                   </tr>
@@ -111,15 +147,19 @@ class UpdateBill extends Component {
             nextSrc={currentCustBills[(photoIndex + 1) % currentCustBills.length]}
             prevSrc={currentCustBills[(photoIndex + currentCustBills.length - 1) % currentCustBills.length]}
             onCloseRequest={() => this.setState({ isOpen: false })}
-            onMovePrevRequest={() =>
+            onMovePrevRequest={() => {
+              if (photoIndex === 0) return false;
               this.setState({
                 photoIndex: (photoIndex + currentCustBills.length - 1) % currentCustBills.length,
               })
             }
-            onMoveNextRequest={() =>
+            }
+            onMoveNextRequest={() => {
+              if (photoIndex === currentCustBills.length - 1) return false;
               this.setState({
                 photoIndex: (photoIndex + 1) % currentCustBills.length,
               })
+            }
             }
           />
         )}

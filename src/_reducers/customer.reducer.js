@@ -25,6 +25,17 @@ export function customer(state = {}, action) {
       }
     case customerConstants.UPDATEBILL_FAILURE:
       return {}
+    case customerConstants.UPDATEBILLDATA_REQUEST:
+      return {
+        getBill: true
+      }
+    case customerConstants.UPDATEBILLDATA_SUCCESS:
+      return {
+        billData: action.data.billData,
+        success: true
+      }
+    case customerConstants.UPDATEBILLDATA_FAILURE:
+      return {}
     case customerConstants.CHECKGST_REQUEST:
       return {
         checkStatus: true

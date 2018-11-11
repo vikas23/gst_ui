@@ -1,7 +1,6 @@
 import config from 'config';
 import {
-  authHeader,
-  authHeaderNoJson
+  authHeader
 } from '../_helpers';
 
 import {
@@ -16,6 +15,7 @@ export const customerService = {
   uploadBills,
   updateBills,
   checkGstStatus,
+  updateBillData,
 }
 
 function uploadBills(billData) {
@@ -44,4 +44,14 @@ function checkGstStatus() {
   };
 
   return fetch(`${config.apiUrl}/customer/checkGstStatus`, requestOptions).then(handleResponse);
+}
+
+function updateBillData(billData) {
+  const requestOptions = {
+    method: 'PUT',
+    headers: authHeader(),
+    body: JSON.stringify(billData)
+  };
+
+  return fetch(`${config.apiUrl}/employee/updateCustomerBillData`, requestOptions).then(handleResponse);
 }
